@@ -1,4 +1,6 @@
+# Ignorar archivos generales
 *.pyc
 *.env
 
-/venv
+# Ignorar carpetas
+venv
