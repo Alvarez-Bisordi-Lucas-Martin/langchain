@@ -70,7 +70,7 @@ def use_gemini_with_doc(parametros, save_history):
     document_chunks = document_loader.load()
     document_chunks_ids = []
     
-    for index, document_chunk in enumerate(document_chunks):
+    for document_chunk in document_chunks:
         content_hash = hashlib.sha256(document_chunk.page_content.encode('utf-8')).hexdigest()
 
         document_chunk.metadata['id'] = f'{os.path.basename(document_path)}_{content_hash}'

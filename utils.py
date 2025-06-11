@@ -42,4 +42,4 @@ def pedir_valor(mensaje, minimo, maximo, tipo):
         except ValueError:
             pass
 
-        print('Valor inválido. Intente nuevamente.')
+        print('Valor invalido. Intente nuevamente.')
