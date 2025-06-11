@@ -64,7 +64,7 @@ def use_gemini(parametros, save_history):
 
 
 def use_gemini_with_doc(parametros, save_history):
-    document_path = r'C:\Users\DELL\OneDrive\Documentos\Tecnicatura en Programacion\Documentos\UTN-FRRE Mails.pdf'
+    document_path = r'C:\Users\DELL\OneDrive\Documentos\Ecom\Clientes\Contaduria General\Documentos\v2\DOCUMENTO N°4 - LAF 1092A.pdf'
     document_loader = PyPDFLoader(document_path)
     
     document_chunks = document_loader.load()

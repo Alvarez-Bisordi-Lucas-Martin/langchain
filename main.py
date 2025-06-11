@@ -1,4 +1,4 @@
-import funciones, constantes
+import funciones, utils, constantes
 
 
 if __name__ == '__main__':
@@ -13,12 +13,7 @@ if __name__ == '__main__':
     print('==============================')
 
     while True:
-        print(f'\n{index}. Seleccione un modelo:')
-        print('A) Gemini | Free | Google.')
-        print('B) Llama  | Free | HuggingFace.')
-        print('C) Gemini | Document | Google.')
-
-        opcion = input('\nOpcion seleccionada: ').strip().upper()
+        opcion = utils.elegir_opcion(index)
 
         if opcion == constantes.OPCION_SALIR_VALUE:
             print('\n==============================')
@@ -27,20 +22,10 @@ if __name__ == '__main__':
         accion = opciones.get(opcion)
 
         if not accion:
-            print('\nIngrese una opcion valida.')
+            print('\nValor invalido. Intente nuevamente.')
             continue
 
-        print('\nConfigure los parametros:')
-        parametros = {
-            'temperature': float(input('Temperature (0.0 - 2.0): ')),
-            'top_p': float(input('Top-p (0.0 - 1.0): '))
-        }
-
-        if opcion in ('A', 'C'):
-            parametros.update({
-                'top_k': int(input('Top-k (1 - 100): ')),
-                'max_output_tokens': int(input('Max output tokens (0 - 8192): '))
-            })
+        parametros = utils.configurar_parametros(opcion)
 
         save_history = input('\n¿Desea mantener el historial de la conversacion? (Y - N): ').strip().upper() == 'Y'
 

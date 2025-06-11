@@ -5,3 +5,10 @@ CONTEXT_WITH_DOC_VALUE = CONTEXT_VALUE + '\n\nResponde a partir de esta informac
 CONTEXT_WITH_DOC_AND_HISTORY_VALUE = CONTEXT_WITH_DOC_VALUE + '\n\nDebes responder unicamente la ultima pregunta del usuario.'
 
 COLLECTION_NAME = 'POC-LANGCHAIN-V0.0.1'
+
+PARAMETROS_DEFAULT = {
+    'temperature': 0.2,
+    'top_p': 0.85,
+    'top_k': 30,
+    'max_output_tokens': 400
+}
