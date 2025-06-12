@@ -4,7 +4,7 @@ CONTEXT_VALUE = 'Eres un asistente personal.'
 CONTEXT_WITH_DOC_VALUE = CONTEXT_VALUE + '\n\nResponde a partir de esta informacion:\n\n{context}'
 CONTEXT_WITH_DOC_AND_HISTORY_VALUE = CONTEXT_WITH_DOC_VALUE + '\n\nDebes responder unicamente la ultima pregunta del usuario.'
 
-COLLECTION_NAME = 'POC-LANGCHAIN-V0.0.4'
+COLLECTION_NAME = 'POC-LANGCHAIN-V0.0.6'
 
 PARAMETROS_LLM_DEFAULT = {
     'temperature': 0.2,
@@ -15,9 +15,9 @@ PARAMETROS_LLM_DEFAULT = {
 
 PARAMETROS_SPLITER_DEFAULT = {
     'chunk_size': 3000,
-    'chunk_overlap': 300,
+    'chunk_overlap': 0,
     'length_function': len,
-    'separators': ['\n\n', '\n', '.'],
+    'separators': ['.', '\n'],
     'add_start_index': True,
     'keep_separator': False,
     'is_separator_regex': False

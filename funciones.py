@@ -85,7 +85,9 @@ def use_gemini_with_doc(parametros, save_history):
         # Eliminar espacios externos
         document_chunk.page_content = document_chunk.page_content.strip()
         # Eliminar espacios internos duplicados
-        document_chunk.page_content = re.sub(r'\s+', ' ', document_chunk.page_content)
+        document_chunk.page_content = re.sub(r' {2,}', ' ', document_chunk.page_content)
+        # Eliminar saltos de linea internos con espacios
+        document_chunk.page_content = re.sub(r' *\n *', '\n', document_chunk.page_content)
 
         content_hash = hashlib.sha256(document_chunk.page_content.encode('utf-8')).hexdigest()
 
