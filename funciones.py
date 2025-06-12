@@ -1,4 +1,4 @@
-import os, constantes, utils, hashlib
+import os, constantes, utils, hashlib, re
 
 from dotenv import load_dotenv
 
@@ -80,7 +80,12 @@ def use_gemini_with_doc(parametros, save_history):
         document_chunks = text_spliter.split_documents(document_chunks)
     
     for document_chunk in document_chunks:
-        document_chunk.page_content = document_chunk.page_content.replace('\x00', '').strip()
+        # Eliminar caracteres nulos
+        document_chunk.page_content = document_chunk.page_content.replace('\x00', '')
+        # Eliminar espacios externos
+        document_chunk.page_content = document_chunk.page_content.strip()
+        # Eliminar espacios internos duplicados
+        document_chunk.page_content = re.sub(r'\s+', ' ', document_chunk.page_content)
 
         content_hash = hashlib.sha256(document_chunk.page_content.encode('utf-8')).hexdigest()
 
