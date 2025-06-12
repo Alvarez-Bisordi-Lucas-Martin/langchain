@@ -66,6 +66,7 @@ def use_gemini(parametros, save_history):
 
 def use_gemini_with_doc(parametros, save_history):
     document_path = r'C:\Users\DELL\OneDrive\Documentos\Ecom\Clientes\Contaduria General\Documentos\v2\DOCUMENTO N°4 - LAF 1092A.pdf'
+    document_name = os.path.basename(document_path)
     document_loader = PyPDFLoader(document_path)
     
     document_chunks = document_loader.load()
@@ -79,11 +80,17 @@ def use_gemini_with_doc(parametros, save_history):
         document_chunks = text_spliter.split_documents(document_chunks)
     
     for document_chunk in document_chunks:
+        document_chunk.page_content = document_chunk.page_content.replace('\x00', '').strip()
+
         content_hash = hashlib.sha256(document_chunk.page_content.encode('utf-8')).hexdigest()
 
-        document_chunk.metadata['id'] = f'{os.path.basename(document_path)}_{content_hash}'
+        document_chunks_ids.append(f'{document_name}_{content_hash}')
 
-        document_chunks_ids.append(document_chunk.metadata['id'])
+        document_chunk.metadata = {
+            'page': document_chunk.metadata.get('page'),
+            'source': document_chunk.metadata.get('source'),
+            'start_index': document_chunk.metadata.get('start_index')
+        }
     
     embeddings = GoogleGenerativeAIEmbeddings(
         model='models/embedding-001',
@@ -105,7 +112,7 @@ def use_gemini_with_doc(parametros, save_history):
         else FAISS.from_documents(document_chunks, embeddings)
     )
     
-    retriever = vector_store.as_retriever()
+    retriever = vector_store.as_retriever(**constantes.PARAMETROS_RETRIEVER_DEFAULT)
 
     llm = ChatGoogleGenerativeAI(
         model=GOOGLE_MODEL,
@@ -135,9 +142,25 @@ def use_gemini_with_doc(parametros, save_history):
             {'input': ' - '.join(message for message in human_messages_history) if save_history else prompt}
         )
 
-        print(f'\nRespuesta de Gemini:\n{respuesta['answer']}')
+        print(f'\nRespuesta de Gemini:\n{respuesta.get('answer')}')
 
         index += 1
+
+        context = respuesta.get('context')
+
+        if not context:
+            print(f'\nNo se encontraron embeddings con una similitud mayor o igual a {constantes.PARAMETROS_RETRIEVER_DEFAULT['search_kwargs']['score_threshold']}.')
+            continue
+        
+        print('\nEmbeddings consultados:')
+        for index, document in enumerate(context):
+            metadata = document.metadata
+            
+            page = metadata.get('page')
+            source = metadata.get('source')
+            start_index = metadata.get('start_index')
+
+            print(f'{index}.\nPage: {page}\nSource: {source}\nStart index: {start_index}')
 
 
 def use_llama(parametros, save_history):

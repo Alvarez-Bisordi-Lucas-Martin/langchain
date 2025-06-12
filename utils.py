@@ -37,8 +37,8 @@ def configurar_parametros_spliter():
         return constantes.PARAMETROS_SPLITER_DEFAULT.copy()
 
     return {
-        'chunck_size': pedir_valor('Chunk size', 1000, 4000, int),
-        'chunck_overlap': pedir_valor('Chunk overlap', 0, 200, int),
+        'chunk_size': pedir_valor('Chunk size', 1000, 4000, int),
+        'chunk_overlap': pedir_valor('Chunk overlap', 0, 200, int),
         'length_function': constantes.PARAMETROS_SPLITER_DEFAULT['length_function'],
         'separators': constantes.PARAMETROS_SPLITER_DEFAULT['separators'],
         'add_start_index': pedir_valor('Add start index', 0, 1, bool),
