@@ -14,3 +14,10 @@ GOOGLE_API_KEY=xxxx
 
 HUGGING_FACE_LLAMA_MODEL=meta-llama/Llama-3.1-8B-Instruct
 HUGGING_FACE_API_KEY=xxxx
+
+
+# =============================
+# PARAMETROS
+# =============================
+
+COLLECTION_NAME=POC-LANGCHAIN-V0.0.1

@@ -29,6 +29,8 @@ HUGGING_FACE_API_KEY = os.getenv('HUGGING_FACE_API_KEY')
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 
+COLLECTION_NAME = os.getenv('COLLECTION_NAME')
+
 
 def use_gemini(parametros, save_history):
     llm = ChatGoogleGenerativeAI(
@@ -111,7 +113,7 @@ def use_gemini_with_doc(parametros, save_history):
             documents=document_chunks,
             embedding=embeddings,
             connection=DATABASE_URL,
-            collection_name=constantes.COLLECTION_NAME,
+            collection_name=COLLECTION_NAME,
             use_jsonb=True,
             ids=document_chunks_ids
         )
