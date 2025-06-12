@@ -1,9 +1,10 @@
-import os, constantes, hashlib
+import os, constantes, utils, hashlib
 
 from dotenv import load_dotenv
 
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 
@@ -69,6 +70,13 @@ def use_gemini_with_doc(parametros, save_history):
     
     document_chunks = document_loader.load()
     document_chunks_ids = []
+
+    if input('\n¿Desea splitear el documento? (Y - N): ').strip().upper() == 'Y':
+        parametros_spliter = utils.configurar_parametros_spliter()
+        
+        text_spliter = RecursiveCharacterTextSplitter(**parametros_spliter)
+
+        document_chunks = text_spliter.split_documents(document_chunks)
     
     for document_chunk in document_chunks:
         content_hash = hashlib.sha256(document_chunk.page_content.encode('utf-8')).hexdigest()

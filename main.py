@@ -25,7 +25,7 @@ if __name__ == '__main__':
             print('\nValor invalido. Intente nuevamente.')
             continue
 
-        parametros = utils.configurar_parametros(opcion)
+        parametros = utils.configurar_parametros_llm(opcion)
 
         save_history = input('\n¿Desea mantener el historial de la conversacion? (Y - N): ').strip().upper() == 'Y'
 
