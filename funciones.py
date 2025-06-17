@@ -21,10 +21,11 @@ from huggingface_hub import InferenceClient
 
 load_dotenv()
 
-GOOGLE_MODEL = os.getenv('GOOGLE_MODEL')
+GOOGLE_LLM_MODEL = os.getenv('GOOGLE_LLM_MODEL')
+GOOGLE_EMBEDDING_MODEL = os.getenv('GOOGLE_EMBEDDING_MODEL')
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 
-HUGGING_FACE_LLAMA_MODEL = os.getenv('HUGGING_FACE_LLAMA_MODEL')
+HUGGING_FACE_LLAMA_LLM_MODEL = os.getenv('HUGGING_FACE_LLAMA_LLM_MODEL')
 HUGGING_FACE_API_KEY = os.getenv('HUGGING_FACE_API_KEY')
 
 DATABASE_URL = os.getenv('DATABASE_URL')
@@ -34,7 +35,7 @@ COLLECTION_NAME = os.getenv('COLLECTION_NAME')
 
 def use_gemini(parametros, save_history):
     llm = ChatGoogleGenerativeAI(
-        model=GOOGLE_MODEL,
+        model=GOOGLE_LLM_MODEL,
         google_api_key=GOOGLE_API_KEY,
         **parametros
     )
@@ -74,6 +75,8 @@ def use_gemini_with_doc(parametros, save_history):
     document_chunks = document_loader.load()
     document_chunks_ids = []
 
+    parametros_spliter = None
+
     if input('\n¿Desea splitear el documento? (Y - N): ').strip().upper() == 'Y':
         parametros_spliter = utils.configurar_parametros_spliter()
         
@@ -102,7 +105,7 @@ def use_gemini_with_doc(parametros, save_history):
         }
     
     embeddings = GoogleGenerativeAIEmbeddings(
-        model='models/embedding-001',
+        model=GOOGLE_EMBEDDING_MODEL,
         google_api_key=GOOGLE_API_KEY
     )
 
@@ -114,6 +117,13 @@ def use_gemini_with_doc(parametros, save_history):
             embedding=embeddings,
             connection=DATABASE_URL,
             collection_name=COLLECTION_NAME,
+            collection_metadata={
+                'llm_model': GOOGLE_LLM_MODEL,
+                'embedding_model': GOOGLE_EMBEDDING_MODEL,
+                'parametros_spliter': parametros_spliter,
+                'parametros_retriever': constantes.PARAMETROS_RETRIEVER_DEFAULT,
+                'embeddings': len(document_chunks)
+            },
             use_jsonb=True,
             ids=document_chunks_ids
         )
@@ -124,7 +134,7 @@ def use_gemini_with_doc(parametros, save_history):
     retriever = vector_store.as_retriever(**constantes.PARAMETROS_RETRIEVER_DEFAULT)
 
     llm = ChatGoogleGenerativeAI(
-        model=GOOGLE_MODEL,
+        model=GOOGLE_LLM_MODEL,
         google_api_key=GOOGLE_API_KEY,
         **parametros
     )
@@ -194,7 +204,7 @@ def use_llama(parametros, save_history):
         messages_history.append({'role': 'user', 'content': prompt})
 
         respuesta = llm.chat_completion(
-            model=HUGGING_FACE_LLAMA_MODEL,
+            model=HUGGING_FACE_LLAMA_LLM_MODEL,
             messages=messages_history if save_history else messages,
             **parametros
         )

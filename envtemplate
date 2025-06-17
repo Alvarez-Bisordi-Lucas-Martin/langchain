@@ -9,10 +9,11 @@ DATABASE_URL=postgresql+psycopg2://postgres:admin@localhost:5432/langchain
 # CREDENCIALES
 # =============================
 
-GOOGLE_MODEL=gemini-2.0-flash-exp
+GOOGLE_LLM_MODEL=gemini-2.0-flash-exp
+GOOGLE_EMBEDDING_MODEL=models/embedding-001
 GOOGLE_API_KEY=xxxx
 
-HUGGING_FACE_LLAMA_MODEL=meta-llama/Llama-3.1-8B-Instruct
+HUGGING_FACE_LLAMA_LLM_MODEL=meta-llama/Llama-3.1-8B-Instruct
 HUGGING_FACE_API_KEY=xxxx
 
 
