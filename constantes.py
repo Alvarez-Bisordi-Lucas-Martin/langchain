@@ -11,7 +11,7 @@ PARAMETROS_LLM_DEFAULT = {
     'max_output_tokens': 500
 }
 
-PARAMETROS_SPLITER_DEFAULT = {
+PARAMETROS_SPLITTER_DEFAULT = {
     'chunk_size': 3000,
     'chunk_overlap': 0,
     'length_function': len,

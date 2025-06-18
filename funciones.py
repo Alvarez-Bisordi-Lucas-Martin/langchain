@@ -67,13 +67,13 @@ def use_gemini_with_doc(parametros, save_history):
     document_path = r'C:\Users\DELL\OneDrive\Documentos\Ecom\Clientes\Contaduria General\Documentos\v2\DOCUMENTO N°4 - LAF 1092A.pdf'
     document_name = os.path.basename(document_path)
     
-    parametros_spliter = None
+    parametros_splitter = None
 
     if input('\n¿Desea splitear el documento? (Y - N): ').strip().upper() == 'Y':
-        parametros_spliter = utils.configurar_parametros_spliter()
+        parametros_splitter = utils.configurar_parametros_splitter()
 
         tokenizador_object = tokenizador.TokenizadorRecursiveCharacterTextSplitter()
-        document_chunks = tokenizador_object.get_document_chunks(document_path, **parametros_spliter)
+        document_chunks = tokenizador_object.get_document_chunks(document_path, **parametros_splitter)
     else:
         tokenizador_object = tokenizador.TokenizadorPyPDFLoader()
         document_chunks = tokenizador_object.get_document_chunks(document_path)
@@ -92,7 +92,7 @@ def use_gemini_with_doc(parametros, save_history):
             COLLECTION_NAME,
             {
                 'embeddings_model': GOOGLE_EMBEDDINGS_MODEL,
-                'parametros_spliter': parametros_spliter,
+                'parametros_splitter': parametros_splitter,
                 'parametros_retriever': constantes.PARAMETROS_RETRIEVER_DEFAULT,
                 'embeddings_count': len(document_chunks)
             }

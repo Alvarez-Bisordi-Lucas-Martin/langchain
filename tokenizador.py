@@ -74,7 +74,7 @@ class TokenizadorPyPDFLoader(Tokenizador):
 
 class TokenizadorRecursiveCharacterTextSplitter(Tokenizador):
     def get_document_chunks(self, document_path, chunk_size=3000, chunk_overlap=0, length_function=len, separators=['.', '\n'], add_start_index=True, keep_separator=False, is_separator_regex=False):
-        text_spliter = RecursiveCharacterTextSplitter(
+        text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
             length_function=length_function,
@@ -88,4 +88,4 @@ class TokenizadorRecursiveCharacterTextSplitter(Tokenizador):
         
         document_chunks = tokenizador.get_document_chunks(document_path)
         
-        return text_spliter.split_documents(document_chunks)
+        return text_splitter.split_documents(document_chunks)

@@ -32,15 +32,15 @@ def configurar_parametros_llm(opcion):
     return parametros
 
 
-def configurar_parametros_spliter():
-    if input('\n¿Desea configurar los parametros del spliter? (Y - N): ').strip().upper() != 'Y':
-        return constantes.PARAMETROS_SPLITER_DEFAULT.copy()
+def configurar_parametros_splitter():
+    if input('\n¿Desea configurar los parametros del splitter? (Y - N): ').strip().upper() != 'Y':
+        return constantes.PARAMETROS_SPLITTER_DEFAULT.copy()
 
     return {
         'chunk_size': pedir_valor('Chunk size', 1000, 4000, int),
         'chunk_overlap': pedir_valor('Chunk overlap', 0, 200, int),
-        'length_function': constantes.PARAMETROS_SPLITER_DEFAULT['length_function'],
-        'separators': constantes.PARAMETROS_SPLITER_DEFAULT['separators'],
+        'length_function': constantes.PARAMETROS_SPLITTER_DEFAULT['length_function'],
+        'separators': constantes.PARAMETROS_SPLITTER_DEFAULT['separators'],
         'add_start_index': pedir_valor('Add start index', 0, 1, bool),
         'keep_separator': pedir_valor('Keep separator', 0, 1, bool),
         'is_separator_regex': pedir_valor('Is separator regex', 0, 1, bool)
