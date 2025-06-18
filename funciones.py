@@ -72,24 +72,28 @@ def use_gemini_with_doc(parametros, save_history):
     if input('\n¿Desea splitear el documento? (Y - N): ').strip().upper() == 'Y':
         parametros_splitter = utils.configurar_parametros_splitter()
 
-        tokenizador_object = tokenizador.TokenizadorRecursiveCharacterTextSplitter()
-        document_chunks = tokenizador_object.get_document_chunks(DOCUMENT_PATH, **parametros_splitter)
-
+        tokenizador_object = tokenizador.TokenizadorRecursiveCharacterTextSplitter(DOCUMENT_PATH, **parametros_splitter)
+        
         parametros_splitter['length_function'] = 'len'
     else:
-        tokenizador_object = tokenizador.TokenizadorPyPDFLoader()
-        document_chunks = tokenizador_object.get_document_chunks(DOCUMENT_PATH)
+        tokenizador_object = tokenizador.TokenizadorPyPDFLoader(DOCUMENT_PATH)
     
-    document_chunks = tokenizador_object.clean_document_chunks(document_chunks)
-    document_chunks = tokenizador_object.set_document_chunks_metadatas(document_chunks)
+    tokenizador_object.create_document_chunks()
 
-    document_chunks_ids = tokenizador_object.get_document_chunks_ids(document_chunks, document_name)
+    tokenizador_object.clean_document_chunks()
 
-    embeddings = tokenizador_object.get_embeddings(GoogleGenerativeAIEmbeddings, GOOGLE_EMBEDDINGS_MODEL, GOOGLE_API_KEY)
+    tokenizador_object.set_document_chunks_metadatas()
+
+    document_chunks_ids = tokenizador_object.get_document_chunks_ids(document_name)
+
+    embeddings_constructor = GoogleGenerativeAIEmbeddings(
+        model=GOOGLE_EMBEDDINGS_MODEL,
+        google_api_key=GOOGLE_API_KEY
+    )
 
     if input('\n¿Desea persistir los embeddings? (Y - N): ').strip().upper() == 'Y':
-        vector_store = tokenizador_object.get_or_create_collection(
-            embeddings,
+        tokenizador_object.create_collection(
+            embeddings_constructor,
             DATABASE_URL,
             COLLECTION_NAME,
             {
@@ -99,12 +103,12 @@ def use_gemini_with_doc(parametros, save_history):
             }
         )
 
-        tokenizador_object.add_document_chunks(vector_store, document_chunks, document_chunks_ids)
+        tokenizador_object.add_document_chunks(document_chunks_ids)
     else:
-        FAISS.from_documents(document_chunks, embeddings)
+        FAISS.from_documents(tokenizador_object.get_document_chunks(), embeddings_constructor)
     
-    retriever = vector_store.as_retriever(**constantes.PARAMETROS_RETRIEVER_DEFAULT)
-
+    retriever = tokenizador_object.get_collection().as_retriever(**constantes.PARAMETROS_RETRIEVER_DEFAULT)
+    
     llm = ChatGoogleGenerativeAI(
         model=GOOGLE_LLM_MODEL,
         google_api_key=GOOGLE_API_KEY,
