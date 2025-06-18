@@ -1,10 +1,7 @@
-import os, constantes, utils, hashlib, re
-
-from dotenv import load_dotenv
+import os, constantes, tokenizador, utils
 
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 
@@ -12,17 +9,16 @@ from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate
 
 from langchain_community.vectorstores import FAISS
-from langchain_community.document_loaders import PyPDFLoader
-
-from langchain_postgres.vectorstores import PGVector
 
 from huggingface_hub import InferenceClient
+
+from dotenv import load_dotenv
 
 
 load_dotenv()
 
 GOOGLE_LLM_MODEL = os.getenv('GOOGLE_LLM_MODEL')
-GOOGLE_EMBEDDING_MODEL = os.getenv('GOOGLE_EMBEDDING_MODEL')
+GOOGLE_EMBEDDINGS_MODEL = os.getenv('GOOGLE_EMBEDDINGS_MODEL')
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 
 HUGGING_FACE_LLAMA_LLM_MODEL = os.getenv('HUGGING_FACE_LLAMA_LLM_MODEL')
@@ -70,66 +66,41 @@ def use_gemini(parametros, save_history):
 def use_gemini_with_doc(parametros, save_history):
     document_path = r'C:\Users\DELL\OneDrive\Documentos\Ecom\Clientes\Contaduria General\Documentos\v2\DOCUMENTO N°4 - LAF 1092A.pdf'
     document_name = os.path.basename(document_path)
-    document_loader = PyPDFLoader(document_path)
     
-    document_chunks = document_loader.load()
-    document_chunks_ids = []
-
     parametros_spliter = None
 
     if input('\n¿Desea splitear el documento? (Y - N): ').strip().upper() == 'Y':
         parametros_spliter = utils.configurar_parametros_spliter()
-        
-        text_spliter = RecursiveCharacterTextSplitter(**parametros_spliter)
 
-        document_chunks = text_spliter.split_documents(document_chunks)
+        tokenizador_object = tokenizador.TokenizadorRecursiveCharacterTextSplitter()
+        document_chunks = tokenizador_object.get_document_chunks(document_path, **parametros_spliter)
+    else:
+        tokenizador_object = tokenizador.TokenizadorPyPDFLoader()
+        document_chunks = tokenizador_object.get_document_chunks(document_path)
     
-    for document_chunk in document_chunks:
-        # Eliminar caracteres nulos
-        document_chunk.page_content = document_chunk.page_content.replace('\x00', '')
-        # Eliminar espacios externos
-        document_chunk.page_content = document_chunk.page_content.strip()
-        # Eliminar espacios internos duplicados
-        document_chunk.page_content = re.sub(r' {2,}', ' ', document_chunk.page_content)
-        # Eliminar saltos de linea internos con espacios
-        document_chunk.page_content = re.sub(r' *\n *', '\n', document_chunk.page_content)
+    document_chunks = tokenizador_object.clean_document_chunks(document_chunks)
+    document_chunks = tokenizador_object.set_document_chunks_metadatas(document_chunks)
 
-        content_hash = hashlib.sha256(document_chunk.page_content.encode('utf-8')).hexdigest()
+    document_chunks_ids = tokenizador_object.get_document_chunks_ids(document_chunks, document_name)
 
-        document_chunks_ids.append(f'{document_name}_{content_hash}')
+    embeddings = tokenizador_object.get_embeddings(GoogleGenerativeAIEmbeddings, GOOGLE_EMBEDDINGS_MODEL, GOOGLE_API_KEY)
 
-        document_chunk.metadata = {
-            'page': document_chunk.metadata.get('page'),
-            'source': document_chunk.metadata.get('source'),
-            'start_index': document_chunk.metadata.get('start_index')
-        }
-    
-    embeddings = GoogleGenerativeAIEmbeddings(
-        model=GOOGLE_EMBEDDING_MODEL,
-        google_api_key=GOOGLE_API_KEY
-    )
-
-    persistir = input('\n¿Desea persistir los embeddings? (Y - N): ').strip().upper() == 'Y'
-
-    vector_store = (
-        PGVector.from_documents(
-            documents=document_chunks,
-            embedding=embeddings,
-            connection=DATABASE_URL,
-            collection_name=COLLECTION_NAME,
-            collection_metadata={
-                'llm_model': GOOGLE_LLM_MODEL,
-                'embedding_model': GOOGLE_EMBEDDING_MODEL,
+    if input('\n¿Desea persistir los embeddings? (Y - N): ').strip().upper() == 'Y':
+        vector_store = tokenizador_object.get_or_create_collection(
+            embeddings,
+            DATABASE_URL,
+            COLLECTION_NAME,
+            {
+                'embeddings_model': GOOGLE_EMBEDDINGS_MODEL,
                 'parametros_spliter': parametros_spliter,
                 'parametros_retriever': constantes.PARAMETROS_RETRIEVER_DEFAULT,
-                'embeddings': len(document_chunks)
-            },
-            use_jsonb=True,
-            ids=document_chunks_ids
+                'embeddings_count': len(document_chunks)
+            }
         )
-        if persistir
-        else FAISS.from_documents(document_chunks, embeddings)
-    )
+
+        tokenizador_object.add_document_chunks(vector_store, document_chunks, document_chunks_ids)
+    else:
+        FAISS.from_documents(document_chunks, embeddings)
     
     retriever = vector_store.as_retriever(**constantes.PARAMETROS_RETRIEVER_DEFAULT)
 

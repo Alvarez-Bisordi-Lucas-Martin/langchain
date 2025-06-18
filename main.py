@@ -1,4 +1,4 @@
-import funciones, utils, constantes
+import constantes, funciones, utils
 
 
 if __name__ == '__main__':
