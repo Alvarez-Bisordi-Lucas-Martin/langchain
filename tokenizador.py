@@ -62,7 +62,7 @@ class Tokenizador(ABC):
         )
     
     def add_document_chunks(self, vector_store, document_chunks, document_chunks_ids=None):
-        vector_store.add_documents(document_chunks, document_chunks_ids)
+        vector_store.add_documents(document_chunks, ids=document_chunks_ids)
 
 
 class TokenizadorPyPDFLoader(Tokenizador):

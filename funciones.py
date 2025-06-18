@@ -41,10 +41,10 @@ def use_gemini(parametros, save_history):
         SystemMessage(content=constantes.CONTEXT_VALUE)
     ]
 
-    index = 1
+    count = 1
 
     while True:
-        prompt = input(f'\n{index}. Ingrese un mensaje: ')
+        prompt = input(f'\n{count}. Ingrese un mensaje: ')
 
         if prompt.upper() == constantes.OPCION_SALIR_VALUE: break
         
@@ -61,7 +61,7 @@ def use_gemini(parametros, save_history):
 
         messages_history.append(AIMessage(content=respuesta.content))
 
-        index += 1
+        count += 1
 
 
 def use_gemini_with_doc(parametros, save_history):
@@ -71,9 +71,11 @@ def use_gemini_with_doc(parametros, save_history):
 
     if input('\n¿Desea splitear el documento? (Y - N): ').strip().upper() == 'Y':
         parametros_splitter = utils.configurar_parametros_splitter()
-        
+
         tokenizador_object = tokenizador.TokenizadorRecursiveCharacterTextSplitter()
         document_chunks = tokenizador_object.get_document_chunks(DOCUMENT_PATH, **parametros_splitter)
+
+        parametros_splitter['length_function'] = 'len'
     else:
         tokenizador_object = tokenizador.TokenizadorPyPDFLoader()
         document_chunks = tokenizador_object.get_document_chunks(DOCUMENT_PATH)
@@ -119,10 +121,10 @@ def use_gemini_with_doc(parametros, save_history):
 
     human_messages_history = []
 
-    index = 1
+    count = 1
 
     while True:
-        prompt = input(f'\n{index}. Ingrese un mensaje: ')
+        prompt = input(f'\n{count}. Ingrese un mensaje: ')
 
         if prompt.upper() == constantes.OPCION_SALIR_VALUE: break
 
@@ -134,7 +136,7 @@ def use_gemini_with_doc(parametros, save_history):
 
         print(f'\nRespuesta de Gemini:\n{respuesta.get('answer')}')
 
-        index += 1
+        count += 1
 
         context = respuesta.get('context')
 
@@ -160,10 +162,10 @@ def use_llama(parametros, save_history):
         {'role': 'system', 'content': constantes.CONTEXT_VALUE}
     ]
 
-    index = 1
+    count = 1
 
     while True:
-        prompt = input(f'\n{index}. Ingrese un mensaje: ')
+        prompt = input(f'\n{count}. Ingrese un mensaje: ')
 
         if prompt.upper() == constantes.OPCION_SALIR_VALUE: break
 
@@ -186,4 +188,4 @@ def use_llama(parametros, save_history):
         
         messages_history.append({'role': 'assistant', 'content': content})
 
-        index += 1
+        count += 1
