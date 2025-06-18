@@ -27,6 +27,7 @@ HUGGING_FACE_API_KEY = os.getenv('HUGGING_FACE_API_KEY')
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 COLLECTION_NAME = os.getenv('COLLECTION_NAME')
+DOCUMENT_PATH = os.getenv('DOCUMENT_PATH')
 
 
 def use_gemini(parametros, save_history):
@@ -64,19 +65,18 @@ def use_gemini(parametros, save_history):
 
 
 def use_gemini_with_doc(parametros, save_history):
-    document_path = r'C:\Users\DELL\OneDrive\Documentos\Ecom\Clientes\Contaduria General\Documentos\v2\DOCUMENTO N°4 - LAF 1092A.pdf'
-    document_name = os.path.basename(document_path)
+    document_name = os.path.basename(DOCUMENT_PATH)
     
     parametros_splitter = None
 
     if input('\n¿Desea splitear el documento? (Y - N): ').strip().upper() == 'Y':
         parametros_splitter = utils.configurar_parametros_splitter()
-
+        
         tokenizador_object = tokenizador.TokenizadorRecursiveCharacterTextSplitter()
-        document_chunks = tokenizador_object.get_document_chunks(document_path, **parametros_splitter)
+        document_chunks = tokenizador_object.get_document_chunks(DOCUMENT_PATH, **parametros_splitter)
     else:
         tokenizador_object = tokenizador.TokenizadorPyPDFLoader()
-        document_chunks = tokenizador_object.get_document_chunks(document_path)
+        document_chunks = tokenizador_object.get_document_chunks(DOCUMENT_PATH)
     
     document_chunks = tokenizador_object.clean_document_chunks(document_chunks)
     document_chunks = tokenizador_object.set_document_chunks_metadatas(document_chunks)

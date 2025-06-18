@@ -22,3 +22,4 @@ HUGGING_FACE_API_KEY=xxxx
 # =============================
 
 COLLECTION_NAME=POC-LANGCHAIN-V0.0.1
+DOCUMENT_PATH=xxxx
