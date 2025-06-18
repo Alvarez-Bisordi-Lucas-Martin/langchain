@@ -95,8 +95,7 @@ def use_gemini_with_doc(parametros, save_history):
             {
                 'embeddings_model': GOOGLE_EMBEDDINGS_MODEL,
                 'parametros_splitter': parametros_splitter,
-                'parametros_retriever': constantes.PARAMETROS_RETRIEVER_DEFAULT,
-                'embeddings_count': len(document_chunks)
+                'parametros_retriever': constantes.PARAMETROS_RETRIEVER_DEFAULT
             }
         )
 
