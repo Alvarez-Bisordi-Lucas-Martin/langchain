@@ -10,7 +10,8 @@ from langchain_postgres.vectorstores import PGVector
 
 
 class Tokenizador(ABC):
-    def __init__(self):
+    def __init__(self, document_path):
+        self.document_path = document_path
         self.document_chunks = None
         self.vector_store = None
     
@@ -18,10 +19,8 @@ class Tokenizador(ABC):
     def create_document_chunks(self):
         pass
     
-    def get_document_chunks(self):
-        return self.document_chunks
-    
-    def reset_document_chunks(self):
+    def reset_document_chunks(self, document_path):
+        self.document_path = document_path
         self.document_chunks = None
     
     def clean_document_chunks(self):
@@ -70,22 +69,15 @@ class Tokenizador(ABC):
 
 
 class TokenizadorPyPDFLoader(Tokenizador):
-    def __init__(self, document_path):
-        super().__init__()
-
-        self.document_path = document_path
-    
     def create_document_chunks(self):
         document_loader = PyPDFLoader(self.document_path)
-
         self.document_chunks = document_loader.load()
 
 
 class TokenizadorRecursiveCharacterTextSplitter(Tokenizador):
     def __init__(self, document_path, chunk_size=3000, chunk_overlap=0, length_function=len, separators=['.', '\n'], add_start_index=True, keep_separator=False, is_separator_regex=False):
-        super().__init__()
+        super().__init__(document_path)
 
-        self.document_path = document_path
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.length_function = length_function
@@ -104,9 +96,8 @@ class TokenizadorRecursiveCharacterTextSplitter(Tokenizador):
             keep_separator=self.keep_separator,
             is_separator_regex=self.is_separator_regex
         )
+        
+        document_loader = PyPDFLoader(self.document_path)
+        document_chunks = document_loader.load()
 
-        tokenizador_object = TokenizadorPyPDFLoader(self.document_path)
-
-        tokenizador_object.create_document_chunks()
-
-        self.document_chunks = text_splitter.split_documents(tokenizador_object.get_document_chunks())
+        self.document_chunks = text_splitter.split_documents(document_chunks)
