@@ -52,12 +52,13 @@ class Tokenizador(ABC):
             for document_chunk in self.document_chunks
         ]
     
-    def create_collection(self, embeddings_constructor, database_url, collection_name, collection_metadata=None, use_jsonb=True):
+    def create_collection(self, embeddings_constructor, database_url, collection_name, collection_metadata=None, pre_delete_collection=False, use_jsonb=True):
         self.vector_store = PGVector(
             embeddings=embeddings_constructor,
             connection=database_url,
             collection_name=collection_name,
             collection_metadata=collection_metadata,
+            pre_delete_collection=pre_delete_collection,
             use_jsonb=use_jsonb
         )
     
